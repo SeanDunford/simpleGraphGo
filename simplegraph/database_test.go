@@ -28,7 +28,7 @@ func ErrorMatches(actual error, expected string) bool {
 }
 
 func TestResolveDbFileReference(t *testing.T) {
-	path := "/tmp/database.sqlite?_foreign_keys=true"
+	path := "/tmp/database.sqlite?"
 	actualPath, actualPathErr := resolveDbFileReference("/tmp", "database.sqlite")
 	if actualPath != path {
 		t.Errorf("resolveDbFileReference(\"/tmp\", \"database.sqlite\") = %q but expected %q", actualPath, path)
@@ -37,7 +37,7 @@ func TestResolveDbFileReference(t *testing.T) {
 		t.Errorf("resolveDbFileReference(\"/tmp\", \"database.sqlite\") = %q but expected nil", actualPathErr.Error())
 	}
 
-	file := "database.sqlite?_foreign_keys=true"
+	file := "database.sqlite?"
 	actualFile, actualFileErr := resolveDbFileReference("database.sqlite")
 	if actualFile != file {
 		t.Errorf("resolveDbFileReference(\"database.sqlite\") = %q but expected %q", actualFile, file)

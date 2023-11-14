@@ -11,15 +11,16 @@ import (
 	"strings"
 	"text/template"
 
-	_ "github.com/mattn/go-sqlite3"
+	_ "github.com/libsql/libsql-client-go/libsql"
+	_ "modernc.org/sqlite"
 )
 
 const (
-	SQLITE                  = "sqlite3"
-	WITH_FOREIGN_KEY_PRAGMA = "%s?_foreign_keys=true"
-	ID_CONSTRAINT           = "NOT NULL constraint failed: nodes.id"
-	UNIQUE_ID_CONSTRAINT    = "UNIQUE constraint failed: nodes.id"
-	NO_ROWS_FOUND           = "sql: no rows in result set"
+	SQLITE = "libsql"
+	// WITH_FOREIGN_KEY_PRAGMA = "%s?_foreign_keys=true"
+	ID_CONSTRAINT        = "NOT NULL constraint failed: nodes.id"
+	UNIQUE_ID_CONSTRAINT = "UNIQUE constraint failed: nodes.id"
+	NO_ROWS_FOUND        = "sql: no rows in result set"
 )
 
 type NodeData struct {
@@ -66,13 +67,22 @@ var (
 	TRAVERSE_TEMPLATE = template.Must(template.New("traverse").Parse(TraverseTemplate))
 )
 
+func getAbsLocation(relativeFilePath string) string {
+	absFilePath, err := filepath.Abs(relativeFilePath)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return absFilePath
+}
+
 func resolveDbFileReference(names ...string) (string, error) {
 	args := len(names)
 	switch args {
 	case 1:
-		return fmt.Sprintf(WITH_FOREIGN_KEY_PRAGMA, names[0]), nil
+		return "file://" + getAbsLocation(names[0]), nil
 	case 2:
-		return fmt.Sprintf(WITH_FOREIGN_KEY_PRAGMA, filepath.Join(names[0], names[1])), nil
+		return "file://" + getAbsLocation(names[0]+names[1]), nil
 	default:
 		return "", errors.New("invalid database file reference")
 	}
